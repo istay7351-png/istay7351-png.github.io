@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width">
+<title>ROBOT BAJE - LuxAlgo Channel</title>
+<style>body{background:#0a0e14;color:#fff;font-family:Arial;margin:0;padding:8px}
+.box{background:#161a22;border-radius:12px;padding:10px;margin-top:8px;border:1px solid #222}
+.price{font-size:28px;color:#00e5ff;font-weight:bold}
+canvas{width:100%;border-radius:8px;background:#0e1116}</style></head><body>
+<div style="display:flex;justify-content:space-between"><b>ROBOT BAJE - LUXALGO AI</b><span id="status">● LIVE</span></div>
+<div class="box"><canvas id="chart" width="600" height="380"></canvas>
+<div id="volInfo" style="font-size:11px;color:gold;text-align:center"></div></div>
+<div class="box"><div class="price" id="livePrice">Loading...</div>
+<div>ENTRY: <b id="entryP">--</b> | SL: <b id="sl1P">--</b> | Garis: <b id="lineCount">--</b></div></div>
+<script>
+let canvas=document.getElementById('chart'),ctx=canvas.getContext('2d');
+function drawLuxChannel(price,volume){
+let w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);
+ctx.fillStyle='#0e1116';ctx.fillRect(0,0,w,h);
+let lineCount=Math.min(60,Math.max(10,Math.floor(volume/18)));
+if(volume>1000)lineCount=60;else if(volume<500)lineCount=Math.floor(volume/17);
+document.getElementById('lineCount').innerText=lineCount+' garis';
+document.getElementById('volInfo').innerText='Volume '+volume.toFixed(0)+' = '+lineCount+' garis | Market Strength: '+(lineCount>40?'STRONG':'WEAK');
+// Garis volume otomatis
+ctx.strokeStyle='rgba(163,255,92,0.15)';ctx.lineWidth=1;
+for(let i=0;i<lineCount;i++){let t=i/lineCount;let y1=50+t*100;let y2=30+t*250;ctx.beginPath();ctx.moveTo(50+t*40,y1+100);ctx.lineTo(w-20,y2-50);ctx.stroke();}
+// 2 Garis utama miring ke atas sejajar
+function mainL(yS,yE){ctx.strokeStyle='#a3ff5c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(50,yS);ctx.lineTo(w-20,yE);ctx.stroke();}
+mainL(h-120,30);mainL(h-70,80);
+// Entry
+ctx.fillStyle='#00aaff';ctx.beginPath();ctx.moveTo(90,h-85);ctx.lineTo(100,h-105);ctx.lineTo(80,h-105);ctx.closePath();ctx.fill();
+ctx.fillStyle='#fff';ctx.fillRect(105,h-108,90,18);ctx.fillStyle='#000';ctx.font='bold 11px Arial';ctx.fillText('BUY '+price.toFixed(2),108,h-96);
+}
+async function getData(){
+let r=await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT');
+let d=await r.json();let price=parseFloat(d.lastPrice),volume=parseFloat(d.volume);
+document.getElementById('livePrice').innerText=price.toFixed(2);
+document.getElementById('entryP').innerText=price.toFixed(2);
+document.getElementById('sl1P').innerText=(price*0.997).toFixed(2);
+document.getElementById('status').innerText='● LIVE Vol:'+volume.toFixed(0);
+drawLuxChannel(price,volume);
+}
+getData();setInterval(getData,8000);
+</script></body></html>
