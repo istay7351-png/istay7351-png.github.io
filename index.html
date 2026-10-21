@@ -1,24 +1,67 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROBOT BAJE - LuxAlgo Channel</title>
-<style>body{background:#0a0e14;color:#fff;font-family:Arial;padding:10px;margin:0}
-.box{background:#161a22;border-radius:12px;padding:15px;margin:10px 0;border:1px solid #222}
-.price{font-size:28px;color:#00e5ff;font-weight:bold}
-.green{color:#00ff88}.red{color:#ff4444}
-canvas{width:100%;border-radius:8px;background:#0f141e}
-button{background:#00e5ff;color:#000;border:0;padding:10px 20px;border-radius:8px;font-weight:bold;width:100%;margin-top:10px}
-h2{color:#00e5ff;margin:5px 0}</style></head><body>
-<div style="display:flex;justify-content:space-between;align-items:center"><h2>ROBOT BAJE</h2><span style="background:#00ff88;color:#000;padding:4px 8px;border-radius:6px;font-size:12px">LIVE</span></div>
-<div class="box"><div style="font-size:12px;opacity:0.6">BTC/USDT - LuxAlgo Premium/Discount</div><div class="price" id="price">$67,245.50</div><div id="change" class="green">+2.34% (Premium Channel)</div></div>
-<div class="box"><canvas id="chart" width="600" height="300"></canvas></div>
-<div class="box"><div style="display:flex;justify-content:space-between"><span>Volatility</span><span id="vol" class="green">High</span></div><div id="volInfo" style="font-size:11px;color:gray;margin-top:5px">Channel Width: 4.2% | Trend: Bullish Premium Zone</div><div style="display:flex;gap:10px;margin-top:10px"><div style="flex:1;background:#0f141e;padding:8px;border-radius:6px;text-align:center"><div style="font-size:11px;opacity:0.6">Upper</div><div id="upper" style="color:#ff4444">68,900</div></div><div style="flex:1;background:#0f141e;padding:8px;border-radius:6px;text-align:center"><div style="font-size:11px;opacity:0.6">Basis</div><div id="basis">67,200</div></div><div style="flex:1;background:#0f141e;padding:8px;border-radius:6px;text-align:center"><div style="font-size:11px;opacity:0.6">Lower</div><div id="lower" style="color:#00ff88">65,500</div></div></div>
-<button onclick="alert('Robot Baje Active! LuxAlgo Channel Running')">AKTIFKAN ROBOT BAJE</button></div>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ROBOT BAJE GOLD - XAUUSD</title>
+<style>
+body{background:#0a0e14;color:#fff;font-family:Arial;padding:12px;margin:0}
+.box{background:#161a22;border-radius:14px;padding:14px;margin:12px 0;border:1px solid #2a2a2a}
+.price{font-size:34px;color:#ffd700;font-weight:bold}
+.green{color:#00ff88}.red{color:#ff5555}
+canvas{width:100%;height:300px;border-radius:10px;background:#0f141e;display:block}
+button{background:linear-gradient(90deg,#ffd700,#ff9500);color:#000;border:0;padding:16px;border-radius:12px;font-weight:bold;width:100%;font-size:17px}
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:space-between;align-items:center">
+<h2 style="color:#ffd700;margin:0">ROBOT BAJE GOLD ⚡</h2>
+<span style="background:#ffd700;color:#000;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:bold">XAUUSD LIVE</span>
+</div>
+
+<div class="box">
+<div style="font-size:11px;opacity:0.6">XAUUSD • GOLD SPOT • LuxAlgo Premium / Discount</div>
+<div class="price" id="pr">$4,285.30</div>
+<div class="green" style="font-size:13px">▲ +0.85% GOLD BULLISH - Premium Channel</div>
+</div>
+
+<div class="box">
+<canvas id="c" width="600" height="300"></canvas>
+<div style="font-size:10px;color:#666;text-align:center;margin-top:8px">LUXALGO PREMIUM/DISCOUNT + VOLATILITY • XAUUSD M15</div>
+</div>
+
+<div class="box">
+<div style="display:flex;justify-content:space-between;font-size:12px">
+<span>Gold Volatility</span><span class="green">● High Volatility</span>
+</div>
+<div style="display:flex;gap:8px;margin-top:12px">
+<div style="flex:1;background:#0f141e;padding:12px;border-radius:10px;text-align:center"><div style="font-size:10px;opacity:0.5">UPPER<br>SELL ZONE</div><div class="red" style="font-weight:bold;margin-top:4px">4,298.50</div></div>
+<div style="flex:1;background:#0f141e;padding:12px;border-radius:10px;text-align:center"><div style="font-size:10px;opacity:0.5">BASIS<br>MID</div><div style="font-weight:bold;margin-top:4px">4,285.30</div></div>
+<div style="flex:1;background:#0f141e;padding:12px;border-radius:10px;text-align:center"><div style="font-size:10px;opacity:0.5">LOWER<br>BUY ZONE</div><div class="green" style="font-weight:bold;margin-top:4px">4,272.10</div></div>
+</div>
+<button onclick="alert('ROBOT BAJE GOLD XAUUSD ACTIVE! Sinyal Gold Aktif Bro!')">🚀 AKTIFKAN ROBOT BAJE GOLD</button>
+</div>
+
 <script>
-const c=document.getElementById('chart'),x=c.getContext('2d');
-function draw(){x.clearRect(0,0,600,300);
-x.strokeStyle='#222';for(let i=0;i<6;i++){x.beginPath();x.moveTo(0,i*50);x.lineTo(600,i*50);x.stroke();}
-let price=150;let upper=[],basis=[],lower=[];
-for(let i=0;i<60;i++){price+= (Math.random()-0.48)*8;basis.push(price);upper.push(price+25);lower.push(price-25);}
-x.strokeStyle='#00e5ff';x.lineWidth=2;x.beginPath();basis.forEach((p,i)=>{let px=i*10,py=280-p; if(i==0)x.moveTo(px,py);else x.lineTo(px,py)});x.stroke();
-x.strokeStyle='rgba(255,68,68,0.5)';x.setLineDash([5,5]);x.beginPath();upper.forEach((p,i)=>{let px=i*10,py=280-p-25; if(i==0)x.moveTo(px,py);else x.lineTo(px,py)});x.stroke();
-x.strokeStyle='rgba(0,255,136,0.5)';x.beginPath();lower.forEach((p,i)=>{let px=i*10,py=280-p+25
+const C=document.getElementById('c'),X=C.getContext('2d');
+function D(){
+X.clearRect(0,0,600,300);
+X.strokeStyle='#1e252f';
+for(let i=0;i<6;i++){X.beginPath();X.moveTo(0,i*50);X.lineTo(600,i*50);X.stroke();}
+let p=140,b=[];
+for(let i=0;i<60;i++){p+=(Math.random()-0.46)*7;b.push(p);}
+X.strokeStyle='#ffd700';X.lineWidth=3;X.beginPath();
+b.forEach((v,i)=>{let px=i*10,py=240-v;if(i==0)X.moveTo(px,py);else X.lineTo(px,py)});X.stroke();
+X.strokeStyle='rgba(255,80,80,0.7)';X.setLineDash([7,4]);X.beginPath();
+b.forEach((v,i)=>{let px=i*10,py=240-v-30;if(i==0)X.moveTo(px,py);else X.lineTo(px,py)});X.stroke();
+X.strokeStyle='rgba(0,255,136,0.7)';X.beginPath();
+b.forEach((v,i)=>{let px=i*10,py=240-v+30;if(i==0)X.moveTo(px,py);else X.lineTo(px,py)});X.stroke();
+X.setLineDash([]);
+X.fillStyle='#ffd700';X.beginPath();X.arc(590,240-b[59],7,0,Math.PI*2);X.fill();
+}
+D();setInterval(D,2000);
+let pr=4285.3;
+setInterval(()=>{pr+=(Math.random()-0.5)*1.8;document.getElementById('pr').innerText='$'+pr.toFixed(2)},900);
+</script>
+</body>
+</html>
