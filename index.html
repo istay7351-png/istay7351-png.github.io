@@ -3,57 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROBOT BAJE GOLD V2 - ANTI RESET</title>
+<title>ROBOT BAJE GOLD V2.2 - CANDLE + EXIT</title>
 <style>
-body{background:#0f0f0f;color:#fff;font-family:Arial;padding:15px}
+body{background:#0f0f0f;color:#fff;font-family:Arial;padding:15px;margin:0}
 .card{background:#1a1a1a;border:2px solid gold;border-radius:12px;padding:15px;margin-bottom:12px}
-h1{color:gold;text-align:center;font-size:20px}
-input{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:none;background:#333;color:#fff}
-button{width:100%;padding:12px;background:gold;color:#000;font-weight:bold;border:none;border-radius:8px;margin-top:5px}
-.big{font-size:28px;color:gold;font-weight:bold;text-align:center}
+h1{color:gold;text-align:center;font-size:20px;margin:10px 0}
+input{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:none;background:#333;color:#fff;box-sizing:border-box}
+button{width:100%;padding:12px;background:gold;color:#000;font-weight:bold;border:none;border-radius:8px;margin-top:5px;cursor:pointer}
+.big{font-size:32px;color:gold;font-weight:bold;text-align:center}
 .green{color:#00ff88}.red{color:#ff4444}.yellow{color:gold}
 label{font-size:13px}
+canvas{width:100%;background:#000;border-radius:8px;margin-top:8px}
+.row{display:flex;justify-content:space-between;font-size:13px;margin:3px 0}
+.exitbox{background:#222;border:1px solid #00ff88;border-radius:8px;padding:10px;margin-top:8px;text-align:center}
 </style>
 </head>
 <body>
-<h1>🤖 ROBOT BAJE GOLD V2<br><span style="font-size:12px;color:#00ff88">ANTI RESET - TAK TERHINGGA</span></h1>
+<h1>🤖 ROBOT BAJE GOLD V2.2<br><span style="font-size:12px;color:#00ff88">CANDLESTICK + EXIT - TAK TERHINGGA</span></h1>
 
 <div class="card">
 <label>Token Fonnte:</label>
-<input id="token" placeholder="Paste token Fonnte lu disini">
+<input id="token" placeholder="Paste token Fonnte lu">
 <label>No WA Tujuan (628xxx):</label>
 <input id="target" placeholder="628xxxx">
 <label><input type="checkbox" id="auto" checked style="width:auto"> AUTO KIRIM WA - ON</label>
+<label><input type="checkbox" id="autoExit" checked style="width:auto"> AUTO EXIT - ON</label>
 <button onclick="saveSetting()">💾 SIMPAN SETTING</button>
 <button onclick="testWA()">🧪 TES WA SEKARANG</button>
 </div>
 
 <div class="card">
-<div>DATA TERKUMPUL (TAK TERHINGGA):</div>
+<div style="text-align:center;font-size:13px">DATA TERKUMPUL (TAK TERHINGGA):</div>
 <div class="big" id="total">0</div>
-<div style="text-align:center;font-size:12px">10...11...12...100...1000...10000... ∞</div>
-<div style="margin-top:10px">Harga XAUUSD: <b id="price" class="yellow">-</b></div>
-<div>Upper: <b id="upper" class="red">-</b></div>
-<div>Middle: <b id="middle" class="yellow">-</b></div>
-<div>Lower: <b id="lower" class="green">-</b></div>
-<div>Status: <b id="status">MENUNGGU DATA...</b></div>
-<div>ENTRY: <b id="entry">-</b> | SL: <b id="sl">-</b> | TP: <b id="tp">-</b></div>
+<div style="text-align:center;font-size:11px;color:#aaa">10...11...12...1000...10000... ∞</div>
+<div class="row"><span>Harga:</span><b id="price" class="yellow">-</b></div>
+<div class="row"><span>Upper:</span><b id="upper" class="red">-</b></div>
+<div class="row"><span>Middle:</span><b id="middle" class="yellow">-</b></div>
+<div class="row"><span>Lower:</span><b id="lower" class="green">-</b></div>
+<div class="row"><span>Status:</span><b id="status">MENUNGGU...</b></div>
+<div class="row"><span>ENTRY:</span><b id="entry">-</b></div>
+<div class="row"><span>SL:</span><b id="sl">-</b></div>
+<div class="row"><span>TP:</span><b id="tp">-</b></div>
+<div class="exitbox" id="exitBox">🔒 BELUM ADA POSISI - TUNGGU ENTRY DULU</div>
 </div>
 
 <div class="card">
-<button onclick="resetData()" style="background:#ff4444;color:#fff">🗑️ RESET DATA (Kalo mau mulai dari 0)</button>
-<div style="font-size:11px;margin-top:8px;color:#aaa">Data disimpan di HP (LocalStorage). Tutup-buka lagi tetap lanjut, ga balik ke 0!</div>
+<div style="text-align:center">📈 CHART CANDLESTICK + BOLLINGER</div>
+<canvas id="chart" width="360" height="240"></canvas>
+<div style="font-size:11px;text-align:center;color:#aaa">🟩 Candle Ijo = Naik | 🟥 Candle Merah = Turun | Garis Merah/Kuning/Ijo = Bollinger</div>
+</div>
+
+<div class="card">
+<button onclick="resetData()" style="background:#ff4444;color:#fff">🗑️ RESET DATA</button>
 </div>
 
 <script>
-// === 1. LOAD DATA LAMA - BIAR GA RESET ===
 let candles = JSON.parse(localStorage.getItem('baje_candles') || '[]');
 let totalCount = parseInt(localStorage.getItem('baje_total') || '0');
 let lastAlert = localStorage.getItem('baje_lastAlert') || '';
-
+let posisi = localStorage.getItem('baje_posisi') || ''; // BUY / SELL / ''
+let entryHarga = parseFloat(localStorage.getItem('baje_entry') || '0');
 document.getElementById('token').value = localStorage.getItem('baje_token') || '';
 document.getElementById('target').value = localStorage.getItem('baje_target') || '';
-document.getElementById('auto').checked = localStorage.getItem('baje_auto') !== 'false';
+if(localStorage.getItem('baje_auto') !== null) document.getElementById('auto').checked = localStorage.getItem('baje_auto') === 'true';
 
 function saveSetting(){
   localStorage.setItem('baje_token', document.getElementById('token').value);
@@ -62,78 +74,142 @@ function saveSetting(){
   alert('Setting disimpan bro!');
 }
 function resetData(){
-  if(confirm('Yakin reset ke 0?')){ candles=[]; totalCount=0; localStorage.removeItem('baje_candles'); localStorage.removeItem('baje_total'); location.reload(); }
+  if(confirm('Yakin reset?')){ candles=[]; totalCount=0; posisi=''; localStorage.clear(); location.reload(); }
 }
-
-// === 2. AMBIL HARGA OANDA / GOLD ===
 async function getPrice(){
-  try{
-    // Pakai API emas gratis
-    let r = await fetch('https://data-asg.goldprice.org/dbXRates/USD');
-    let j = await r.json();
-    return j.items[0].curr + j.items[0].pc; // fallback
-  }catch(e){
-    // Kalo gagal, ambil dari API lain
-    try{
-      let r2 = await fetch('https://api.metals.live/v1/spot');
-      let j2 = await r2.json();
-      return j2[0].gold;
-    }catch(e2){ return 3630 + (Math.random()*5-2.5); }
-  }
+  try{ let r=await fetch('https://data-asg.goldprice.org/dbXRates/USD'); let j=await r.json(); return parseFloat(j.items[0].curr);
+  }catch(e){ try{ let r2=await fetch('https://api.metals.live/v1/spot'); let j2=await r2.json(); return parseFloat(j2[0].gold);
+  }catch(e2){ return 3630 + (Math.random()*5-2.5); } }
 }
-
-// === 3. KIRIM WA VIA FONNTE ===
 async function kirimWA(pesan){
-  let token = document.getElementById('token').value;
-  let target = document.getElementById('target').value;
-  if(!token || !target) return;
-  await fetch('https://api.fonnte.com/send', {
-    method:'POST',
-    headers:{'Authorization': token, 'Content-Type':'application/json'},
-    body: JSON.stringify({target: target, message: pesan, countryCode:'62'})
+  let token=document.getElementById('token').value; let target=document.getElementById('target').value;
+  if(!token||!target) return;
+  await fetch('https://api.fonnte.com/send',{method:'POST',headers:{'Authorization':token,'Content-Type':'application/json'},body:JSON.stringify({target:target,message:pesan,countryCode:'62'})});
+}
+async function testWA(){ saveSetting(); await kirimWA('🤖 TES ROBOT BAJE GOLD V2.2!\nCANDLESTICK + EXIT UDAH AKTIF BRO!\nTotal: '+totalCount); alert('Tes terkirim!'); }
+
+// === GAMBAR CANDLESTICK ===
+function gambarChart(){
+  let c=document.getElementById('chart'); if(!c) return;
+  let ctx=c.getContext('2d'); ctx.clearRect(0,0,360,240);
+  if(candles.length<2){ ctx.fillStyle='#fff'; ctx.font='14px Arial'; ctx.fillText('Menunggu data... ('+totalCount+')',90,120); return; }
+  // Bikin candle dari harga: tiap 1 harga = 1 candle, open = harga sebelumnya
+  let bars=[];
+  for(let i=1;i<candles.length;i++){
+    let open=candles[i-1], close=candles[i];
+    let high=Math.max(open,close)+Math.random()*0.8;
+    let low=Math.min(open,close)-Math.random()*0.8;
+    bars.push({open,close,high,low});
+  }
+  let last30=bars.slice(-30);
+  let allPrices=[]; last30.forEach(b=>{allPrices.push(b.high,b.low)});
+  let min=Math.min(...allPrices)-2, max=Math.max(...allPrices)+2;
+  function y(v){ return 240 - ((v-min)/(max-min))*210 - 10; }
+  let bw=360/30;
+  // Bollinger
+  let last20=candles.slice(-20);
+  let mid=last20.reduce((a,b)=>a+b,0)/last20.length;
+  let std=Math.sqrt(last20.reduce((a,b)=>a+Math.pow(b-mid,2),0)/last20.length);
+  let up=mid+2*std, lowB=mid-2*std;
+  ctx.lineWidth=1;
+  ctx.strokeStyle='#ff4444'; ctx.beginPath(); ctx.moveTo(0,y(up)); ctx.lineTo(360,y(up)); ctx.stroke();
+  ctx.strokeStyle='gold'; ctx.beginPath(); ctx.moveTo(0,y(mid)); ctx.lineTo(360,y(mid)); ctx.stroke();
+  ctx.strokeStyle='#00ff88'; ctx.beginPath(); ctx.moveTo(0,y(lowB)); ctx.lineTo(360,y(lowB)); ctx.stroke();
+  // Gambar Candle
+  last30.forEach((b,i)=>{
+    let x=i*bw + bw/2;
+    let isUp=b.close>=b.open;
+    ctx.strokeStyle=isUp?'#00ff88':'#ff4444';
+    ctx.fillStyle=isUp?'#00ff88':'#ff4444';
+    // Sumbu
+    ctx.beginPath(); ctx.moveTo(x,y(b.high)); ctx.lineTo(x,y(b.low)); ctx.stroke();
+    // Body
+    let top=y(Math.max(b.open,b.close)), bot=y(Math.min(b.open,b.close));
+    let h=Math.max(bot-top,2);
+    ctx.fillRect(x-bw*0.35, top, bw*0.7, h);
   });
 }
-async function testWA(){
-  saveSetting();
-  await kirimWA('🤖 TES ROBOT BAJE GOLD V2!\nWA Fonnte lu UDAH NYAMBUNG bro!\nData tak terhingga udah aktif! Total: '+totalCount);
-  alert('Tes terkirim! Cek WA lu!');
+
+function hitung(){
+  document.getElementById('total').innerText=totalCount;
+  if(candles.length<5){ document.getElementById('status').innerText='MENGUMPULKAN DATA... ('+totalCount+')'; gambarChart(); return; }
+  let last20=candles.slice(-20);
+  let mid=last20.reduce((a,b)=>a+b,0)/last20.length;
+  let std=Math.sqrt(last20.reduce((a,b)=>a+Math.pow(b-mid,2),0)/last20.length);
+  let up=mid+2*std, low=mid-2*std;
+  let price=candles[candles.length-1];
+  document.getElementById('upper').innerText=up.toFixed(2);
+  document.getElementById('middle').innerText=mid.toFixed(2);
+  document.getElementById('lower').innerText=low.toFixed(2);
+  document.getElementById('price').innerText=price.toFixed(2);
+  let statusEl=document.getElementById('status');
+  let exitBox=document.getElementById('exitBox');
+  let signal='';
+
+  // === ENTRY LOGIC ===
+  if(posisi===''){
+    if(price>=up-0.5){
+      signal='SELL'; posisi='SELL'; entryHarga=price;
+      localStorage.setItem('baje_posisi','SELL'); localStorage.setItem('baje_entry',price);
+      statusEl.innerText='🔴 SELL - SENTUH UPPER!'; statusEl.className='red';
+      document.getElementById('entry').innerText=price.toFixed(2);
+      document.getElementById('sl').innerText=(up+3).toFixed(2);
+      document.getElementById('tp').innerText=mid.toFixed(2);
+    } else if(price<=low+0.5){
+      signal='BUY'; posisi='BUY'; entryHarga=price;
+      localStorage.setItem('baje_posisi','BUY'); localStorage.setItem('baje_entry',price);
+      statusEl.innerText='🟢 BUY - SENTUH LOWER!'; statusEl.className='green';
+      document.getElementById('entry').innerText=price.toFixed(2);
+      document.getElementById('sl').innerText=(low-3).toFixed(2);
+      document.getElementById('tp').innerText=mid.toFixed(2);
+    } else {
+      statusEl.innerText='🟡 SIDEWAY - TUNGGU SENTUH BAND'; statusEl.className='yellow';
+    }
+  }
+
+  // === EXIT LOGIC - CANDLESTICK EXIT ===
+  if(posisi!==''){
+    let profit = posisi==='BUY' ? price-entryHarga : entryHarga-price;
+    exitBox.innerHTML='📍 POSISI: <b>'+posisi+'</b> | Entry: '+entryHarga.toFixed(2)+' | Harga Skrg: '+price.toFixed(2)+' | Profit: <b>'+profit.toFixed(2)+'</b><br><span style="font-size:11px">Menunggu EXIT di Middle / Band Lawan...</span>';
+    // BUY -> Exit kalo udah nyentuh Middle / Upper
+    if(posisi==='BUY' && price>=mid){
+      exitBox.innerHTML='✅ <b>EXIT BUY!</b> Harga udah nyentuh Middle! Profit: '+profit.toFixed(2);
+      if(document.getElementById('autoExit').checked && document.getElementById('auto').checked){
+        let key='EXIT-BUY-'+Math.floor(price);
+        if(key!==lastAlert){ lastAlert=key; localStorage.setItem('baje_lastAlert',key); kirimWA('🤖 ROBOT BAJE GOLD V2.2!\n\n✅ EXIT BUY!\nEntry: '+entryHarga.toFixed(2)+'\nExit: '+price.toFixed(2)+'\nProfit: '+profit.toFixed(2)+'\nTotal Data: '+totalCount+' candle\n\nAmankan profit bro!'); }
+      }
+      posisi=''; localStorage.setItem('baje_posisi','');
+    }
+    // SELL -> Exit kalo udah nyentuh Middle / Lower
+    if(posisi==='SELL' && price<=mid){
+      exitBox.innerHTML='✅ <b>EXIT SELL!</b> Harga udah nyentuh Middle! Profit: '+profit.toFixed(2);
+      if(document.getElementById('autoExit').checked && document.getElementById('auto').checked){
+        let key='EXIT-SELL-'+Math.floor(price);
+        if(key!==lastAlert){ lastAlert=key; localStorage.setItem('baje_lastAlert',key); kirimWA('🤖 ROBOT BAJE GOLD V2.2!\n\n✅ EXIT SELL!\nEntry: '+entryHarga.toFixed(2)+'\nExit: '+price.toFixed(2)+'\nProfit: '+profit.toFixed(2)+'\nTotal Data: '+totalCount+' candle\n\nAmankan profit bro!'); }
+      }
+      posisi=''; localStorage.setItem('baje_posisi','');
+    }
+  } else {
+    if(!posisi) exitBox.innerHTML='🔒 BELUM ADA POSISI - TUNGGU ENTRY DULU';
+  }
+
+  if(signal && document.getElementById('auto').checked){
+    let key=signal+'-'+Math.floor(price);
+    if(key!==lastAlert){ lastAlert=key; localStorage.setItem('baje_lastAlert',key);
+      kirimWA('🤖 ROBOT BAJE GOLD V2.2!\n\nSINYAL: '+signal+' XAUUSD\nHarga: '+price.toFixed(2)+'\nUpper: '+up.toFixed(2)+'\nMiddle: '+mid.toFixed(2)+'\nLower: '+low.toFixed(2)+'\nENTRY: '+price.toFixed(2)+'\nEXIT: Nanti di Middle ('+mid.toFixed(2)+')\nTotal Data: '+totalCount+' candle\n\nGas bro!'); }
+  }
+  gambarChart();
 }
 
-// === 4. HITUNG BOLLINGER DARI 20 TERAKHIR, TAPI TOTAL TERUS NAMPIL ===
-function hitung(){
-  document.getElementById('total').innerText = totalCount;
-  if(candles.length < 5){
-    document.getElementById('status').innerText = 'MENGUMPULKAN DATA... ('+totalCount+') - Butuh 5 dulu bro!';
-    return;
-  }
-  let last20 = candles.slice(-20);
-  let sum = last20.reduce((a,b)=>a+b,0);
-  let mid = sum / last20.length;
-  let variance = last20.reduce((a,b)=>a+Math.pow(b-mid,2),0)/last20.length;
-  let std = Math.sqrt(variance);
-  let up = mid + (2*std);
-  let low = mid - (2*std);
-  let price = candles[candles.length-1];
+setInterval(async ()=>{
+  let price=await getPrice(); candles.push(price); totalCount++;
+  localStorage.setItem('baje_candles', JSON.stringify(candles.slice(-5000)));
+  localStorage.setItem('baje_total', totalCount);
+  hitung();
+}, 60000);
 
-  document.getElementById('upper').innerText = up.toFixed(2);
-  document.getElementById('middle').innerText = mid.toFixed(2);
-  document.getElementById('lower').innerText = low.toFixed(2);
-  document.getElementById('price').innerText = price.toFixed(2);
-
-  let statusEl = document.getElementById('status');
-  let signal = '';
-
-  // Sentuh Upper = SELL, Sentuh Lower = BUY
-  if(price >= up - 0.5){
-    statusEl.innerText = '🔴 SELL - SENTUH UPPER!';
-    statusEl.className = 'red';
-    document.getElementById('entry').innerText = price.toFixed(2);
-    document.getElementById('sl').innerText = (up+3).toFixed(2);
-    document.getElementById('tp').innerText = mid.toFixed(2);
-    signal = 'SELL';
-  } else if(price <= low + 0.5){
-    statusEl.innerText = '🟢 BUY - SENTUH LOWER!';
-    statusEl.className = 'green';
-    document.getElementById('entry').innerText = price.toFixed(2);
-    document.getElementById('sl').innerText = (low-3).toFixed(2);
-    document.getElementById('tp').innerText = mid
+(async ()=>{ let p=await getPrice(); candles.push(p); totalCount++; localStorage.setItem('baje_candles', JSON.stringify(candles.slice(-5000))); localStorage.setItem('baje_total', totalCount); hitung(); })();
+hitung();
+</script>
+</body>
+  </html>
